@@ -9,6 +9,11 @@ from utils.db import Base
 
 
 class Customer(Base):
+    """customers account.
+
+    Args:
+        Base (_type_): _description_
+    """
     __tablename__ = "customers"
 
     id = Column(Integer, Sequence('customer_seq'), primary_key=True, nullable=False) 
@@ -24,13 +29,19 @@ class Customer(Base):
     state = Column(String, default="")
     postal_code = Column(String, default="")
     created_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False)
-    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False)
+    updated_at = Column(TIMESTAMP(timezone=True), onupdate=(text('now()')), nullable=False)
 
     # one-to-many
     orders = relationship('Order', back_populates='customer')
+    payment = relationship('Payment', back_populates='customer')
 
 
 class ProductCategory(Base):
+    """product category table.
+
+    Args:
+        Base (_type_): _description_
+    """
     __tablename__ = "product_categories"
 
     id = Column(Integer, Sequence('product_cat_seq'), primary_key=True, nullable=False) 
@@ -40,6 +51,11 @@ class ProductCategory(Base):
     products = relationship('Product', back_populates='category')
 
 class Product(Base):
+    """product table.
+
+    Args:
+        Base (_type_): _description_
+    """
     __tablename__ = "products"
 
     id = Column(Integer, Sequence('product_seq'), primary_key=True, nullable=False) 
@@ -51,11 +67,16 @@ class Product(Base):
     style = Column(mutable_json_type(dbtype=JSONB, nested=True), nullable=False)
     stock_qty = Column(Integer)
 
-    # many-to-one relationship from product to product categories
+    # a particular product can only belong to one category
     category = relationship('ProductCategory', back_populates = 'products')
 
 
 class Order(Base):
+    """Orders table.
+
+    Args:
+        Base (_type_): _description_
+    """
     __tablename__ = "orders"
 
     id = Column(Integer, Sequence('order_seq'), primary_key=True, nullable=False)
@@ -64,11 +85,19 @@ class Order(Base):
     order_date = Column(TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False)
     total_amount = Column(Float, nullable=False)
 
-    # many-to-one relationship from order to customer
+    # one-to-one relationship from order to customer
     customer = relationship('Customer', back_populates='orders')
+    order_item = relationship('OrderItem', back_populates='order')
+    shipment = relationship('Shipment', back_populates='orders')
+    payment = relationship('Payment', back_populates='order')
 
 
 class OrderItem(Base):
+    """Individual order item table.
+
+    Args:
+        Base (_type_): _description_
+    """
     __tablename__ = "order_items"
 
     id = Column(Integer, Sequence('order_seq'), primary_key=True)
@@ -77,5 +106,37 @@ class OrderItem(Base):
     sub_total = Column(Float, nullable=False)
     qty = Column(Integer, nullable=False)
 
-    # many-to-one relationship from order to customer
-    customer = relationship('Customer', back_populates='orders')
+    order = relationship('Order', back_populates='order_item')
+
+
+class Shipment(Base):
+    """shipment table for a particular order.
+
+    Args:
+        Base (_type_): _description_
+    """
+    __tablename__ = 'shipments'
+
+    id = Column(Integer, Sequence('order_seq'), primary_key=True)
+    order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
+    
+    orders = relationship('Order', back_populates='shipment')
+
+
+class Payment(Base):
+    """Payment table
+    
+    Args:
+        Base (_type_): _description_
+    """
+    __tablename__ = 'payments'
+
+    id = Column(Integer, Sequence('order_seq'), primary_key=True)
+    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
+    order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
+    payment_date = Column(TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False)
+    payment_method = Column(String, nullable=False)
+    transaction_id = Column(Integer, nullable=False)
+
+    order = relationship('Order', back_populates='payment')
+    customer = relationship('Cutsomer', back_populates='payment')
