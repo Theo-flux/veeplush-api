@@ -20,7 +20,7 @@ class Customer(Base):
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    first_name = Column(String, nullable=False)
+    first_name = Column(String, default="")
     last_name = Column(String, default="")
     phone_number = Column(String, default="")
     shipping_address = Column(String, default="")
@@ -29,7 +29,7 @@ class Customer(Base):
     state = Column(String, default="")
     postal_code = Column(String, default="")
     created_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False)
-    updated_at = Column(TIMESTAMP(timezone=True), onupdate=(text('now()')), nullable=False)
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"), onupdate=text('now()'))
 
     # one-to-many
     orders = relationship('Order', back_populates='customer')
@@ -139,4 +139,4 @@ class Payment(Base):
     transaction_id = Column(Integer, nullable=False)
 
     order = relationship('Order', back_populates='payment')
-    customer = relationship('Cutsomer', back_populates='payment')
+    customer = relationship('Customer', back_populates='payment')
