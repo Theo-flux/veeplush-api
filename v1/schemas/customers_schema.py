@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
@@ -22,3 +23,8 @@ class CustomerResponse(BaseModel):
 
     class Config:
         orm = True
+
+class CustomerLogin(BaseModel):
+    username: Optional[str]  = None
+    email: Optional[EmailStr]  = None
+    password: str

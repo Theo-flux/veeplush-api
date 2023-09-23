@@ -1,17 +1,24 @@
 from typing import List
+from pydantic import EmailStr
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
+
+from oauth2 import generate_token
 from utils.db import get_db
-from utils.pwd_hash import get_pwd_hash
+from utils.pwd_hash import get_pwd_hash, verify_pwd
 import models
-from schemas.customers_schema import NewCustomer, CustomerResponse
+from schemas.customers_schema import (
+    NewCustomer,
+    CustomerLogin,
+    CustomerResponse
+)
 
 
 router = APIRouter(prefix="/customer", tags=['customers'])
 
-@router.get("/", response_model=List[CustomerResponse])
+@router.get("/all", response_model=int)
 async def customers(db: Session = Depends(get_db)):
-    """get all customers from database
+    """get the number of customers available
 
     Args:
         db (Session, optional): _description_. Defaults to Depends(get_db).
@@ -19,11 +26,12 @@ async def customers(db: Session = Depends(get_db)):
     Returns:
         _type_: _description_
     """
-    customers = db.query(models.Customer).all()
+    customers = db.query(models.Customer).count()
 
     return customers
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=CustomerResponse)
+
+@router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=CustomerResponse)
 async def create_customer(customer: NewCustomer, db:Session = Depends(get_db)):
     """create a new customer
 
@@ -61,3 +69,36 @@ async def create_customer(customer: NewCustomer, db:Session = Depends(get_db)):
     db.refresh(new_customer)
 
     return new_customer
+
+@router.post("/login")
+async def login_customer(credentials: CustomerLogin, db: Session = Depends(get_db)):
+    customer = {}
+    if credentials.username:
+        customer = db.query(models.Customer).filter(models.Customer.username == credentials.username).first()
+
+        if not customer:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user doesn't exist!")
+    
+    if credentials.email:
+        customer_email = db.query(models.Customer).filter(models.Customer.email == credentials.email).first()
+
+        if not customer_email:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user doesn't exist!")
+
+    if not verify_pwd(credentials.password, customer.password):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user doesn't exist!")
+    
+    token = generate_token({"user_id": customer.id})
+
+    return {"access_token": token, "type": "Bearer"}
+
+
+@router.get('/', response_model=CustomerResponse)
+async def get_customer(email: EmailStr, db: Session = Depends(get_db)):
+
+    customer_by_mail = db.query(models.Customer).filter(models.Customer.email == email).first()
+
+    if customer_by_mail is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"user with this email:{email} does not exist!")
+    
+    return customer_by_mail
