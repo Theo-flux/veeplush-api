@@ -7,6 +7,22 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy_json import mutable_json_type
 from utils.db import Base
 
+class User(Base):
+    """User for accessing database products
+
+    Args:
+        Base (_type_): _description_
+    """
+    __tablename__ = "users"
+
+    id = Column(Integer, Sequence('user_seq'), primary_key=True, nullable=False)
+    username = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+    role = Column(Enum('admin', 'salesperson', name='role', nullable=False))
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False)
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"), onupdate=text('now()'))
+
 
 class Customer(Base):
     """customers account.

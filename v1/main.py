@@ -3,7 +3,7 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from utils.db import engine
-from routes import customer, product
+from routes import customer, user, products
 import models
 
 
@@ -26,8 +26,10 @@ app = FastAPI(
     },
 )
 
+app.include_router(user.router)
 app.include_router(customer.router)
-app.include_router(product.router)
+app.include_router(products.router)
+
 
 @app.get("/")
 def root():
