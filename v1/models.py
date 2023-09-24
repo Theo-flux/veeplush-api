@@ -74,14 +74,16 @@ class Product(Base):
     """
     __tablename__ = "products"
 
-    id = Column(Integer, Sequence('product_seq'), primary_key=True, nullable=False) 
-    product_category_id = Column(Integer, ForeignKey('product_categories.id'), nullable=False)
+    id = Column(Integer, Sequence('product_seq'), primary_key=True, nullable=False)
+    owner_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    product_category_id = Column(Integer, ForeignKey('product_categories.id', ondelete="CASCADE"), nullable=False)
     name = Column(String, nullable=False)
+    image = Column(String, nullable=False)
     description = Column(String)
     price = Column(Float, nullable=False)
     length = Column(mutable_json_type(dbtype=JSONB, nested=True), nullable=False)
     style = Column(mutable_json_type(dbtype=JSONB, nested=True), nullable=False)
-    stock_qty = Column(Integer)
+    stock_qty = Column(Integer, nullable=False)
 
     # a particular product can only belong to one category
     category = relationship('ProductCategory', back_populates = 'products')
@@ -96,7 +98,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, Sequence('order_seq'), primary_key=True, nullable=False)
-    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
+    customer_id = Column(Integer, ForeignKey('customers.id', ondelete="CASCADE"), nullable=False)
     order_status = Column(Enum('Pending', 'delivered', 'canceled', 'shipped', name='order_status'))
     order_date = Column(TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False)
     total_amount = Column(Float, nullable=False)
@@ -117,7 +119,7 @@ class OrderItem(Base):
     __tablename__ = "order_items"
 
     id = Column(Integer, Sequence('order_seq'), primary_key=True)
-    product_id = Column(Integer, ForeignKey('products.id'), nullable=False)
+    product_id = Column(Integer, ForeignKey('products.id', ondelete="CASCADE"), nullable=False)
     order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
     sub_total = Column(Float, nullable=False)
     qty = Column(Integer, nullable=False)
@@ -134,7 +136,7 @@ class Shipment(Base):
     __tablename__ = 'shipments'
 
     id = Column(Integer, Sequence('order_seq'), primary_key=True)
-    order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
+    order_id = Column(Integer, ForeignKey('orders.id', ondelete="CASCADE"), nullable=False)
     
     orders = relationship('Order', back_populates='shipment')
 
@@ -148,8 +150,8 @@ class Payment(Base):
     __tablename__ = 'payments'
 
     id = Column(Integer, Sequence('order_seq'), primary_key=True)
-    customer_id = Column(Integer, ForeignKey('customers.id'), nullable=False)
-    order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
+    customer_id = Column(Integer, ForeignKey('customers.id', ondelete="CASCADE"), nullable=False)
+    order_id = Column(Integer, ForeignKey('orders.id', ondelete="CASCADE"), nullable=False)
     payment_date = Column(TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False)
     payment_method = Column(String, nullable=False)
     transaction_id = Column(Integer, nullable=False)
