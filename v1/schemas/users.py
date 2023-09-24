@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Optional
-from pydantic import EmailStr, BaseModel
+from pydantic import EmailStr, BaseModel, Field
 from datetime import datetime
 
 
@@ -10,8 +10,8 @@ class Role(str, Enum):
 
 class NewUserSchema(BaseModel):
     email: EmailStr
-    username: str
-    password: str
+    username: str = Field(min_length=4)
+    password: str = Field(min_length=8)
 
 class UserResponseSchema(BaseModel):
     id: int

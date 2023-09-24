@@ -1,10 +1,16 @@
+from os import environ
 from typing import Dict
 from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
-from os import environ
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+
+from utils.db import get_db
+import models
+from schemas.users import UserResponseSchema
+from schemas.customers import CustomerResponseSchema
 
 
 load_dotenv()
@@ -40,21 +46,31 @@ def verify_token(token: str, credentials_exception):
         raise credentials_exception
 
 
-def get_current_user(token: str = Depends(oauth2_user_scheme)):
+def get_current_user(
+    token: str = Depends(oauth2_user_scheme),
+    db: Session = Depends(get_db)
+) -> UserResponseSchema:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="unauthorized!",
         headers={"WWW-Authenticate": "Bearer"}
     )
+    user_id = verify_token(token, credentials_exception)
+    current_user = db.query(models.User).filter(models.User.id == user_id).first()
 
-    return verify_token(token, credentials_exception)
+    return current_user    
 
 
-def get_current_customer(token: str = Depends(oauth2_customer_scheme)):
+def get_current_customer(
+    token: str = Depends(oauth2_customer_scheme),
+    db: Session = Depends(get_db)
+) -> CustomerResponseSchema:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="unauthorized!",
         headers={"WWW-Authenticate": "Bearer"}
     )
+    customer_id = verify_token(token, credentials_exception)
+    current_customer = db.query(models.Customer).filter(models.Customer.id == customer_id).first()
 
-    return verify_token(token, credentials_exception)
+    return current_customer
