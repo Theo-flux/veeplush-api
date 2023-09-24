@@ -14,32 +14,32 @@ from oauth2 import generate_token
 
 router = APIRouter(prefix="/user", tags=['user'])
 
-# @router.post('/create', response_model=UserResponseSchema)
-# async def create_user(user: NewUserSchema, db: Session = Depends(get_db)):
-#     """create a new user"""
-#     user_email_exists = db.query(models.User).filter(models.User.email == user.email).first()
+'''@router.post('/create', response_model=UserResponseSchema)
+async def create_user(user: NewUserSchema, db: Session = Depends(get_db)):
+    """create a new user"""
+    user_email_exists = db.query(models.User).filter(models.User.email == user.email).first()
 
-#     if user_email_exists:
-#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"a user with this email: {user.email} already exists.")
+    if user_email_exists:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"a user with this email: {user.email} already exists.")
 
-#     user_username_exists = db.query(models.User).filter(models.User.username == user.username).first()
+    user_username_exists = db.query(models.User).filter(models.User.username == user.username).first()
 
-#     if user_username_exists:
-#         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Username: {user.username} already taken. Try a new one.")
+    if user_username_exists:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Username: {user.username} already taken. Try a new one.")
     
 
-#     hashed_pwd = get_pwd_hash(user.password)
-#     user.password = hashed_pwd
+    hashed_pwd = get_pwd_hash(user.password)
+    user.password = hashed_pwd
 
-#     user = user.dict()
-#     user.update({"role": "salesperson"})
-#     new_user = models.User(**user)
+    user = user.dict()
+    user.update({"role": "salesperson"})
+    new_user = models.User(**user)
 
-#     db.add(new_user)
-#     db.commit()
-#     db.refresh(new_user)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
 
-#     return new_user
+    return new_user'''
 
 
 @router.post('/user_login', response_model=TokenSchema)
