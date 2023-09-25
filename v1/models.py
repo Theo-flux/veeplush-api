@@ -81,8 +81,8 @@ class Product(Base):
     image = Column(String, nullable=False)
     description = Column(String)
     price = Column(Float, nullable=False)
-    length = Column(mutable_json_type(dbtype=JSONB, nested=True), nullable=False)
-    style = Column(mutable_json_type(dbtype=JSONB, nested=True), nullable=False)
+    length = Column(JSONB)
+    style = Column(JSONB)
     stock_qty = Column(Integer, nullable=False)
 
     # a particular product can only belong to one category

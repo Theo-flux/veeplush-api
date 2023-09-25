@@ -22,7 +22,7 @@ class UserResponseSchema(BaseModel):
     updated_at: datetime
 
     class Config:
-        orm = True
+        from_attributes = True
 
 class CustomerLoginSchema(BaseModel):
     username: Optional[str]  = None
