@@ -8,7 +8,7 @@ from utils.db import get_db
 from utils.pwd_hash import get_pwd_hash, verify_pwd
 import models
 from schemas import TokenSchema
-from schemas.customers import (
+from schemas.customer import (
     NewCustomerSchema,
     CustomerLoginSchema,
     CustomerResponseSchema,

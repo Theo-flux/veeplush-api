@@ -5,7 +5,7 @@ import models
 from utils.db import get_db
 from utils.pwd_hash import get_pwd_hash, verify_pwd
 from schemas import TokenSchema
-from schemas.users import NewUserSchema, UserResponseSchema
+from schemas.user import NewUserSchema, UserResponseSchema
 from oauth2 import generate_token
 
 

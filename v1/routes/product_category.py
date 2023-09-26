@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, status, Depends
 import models
 from utils.db import get_db
 from schemas.product import AddProductCategorySchema
-from schemas.users import UserResponseSchema
+from schemas.user import UserResponseSchema
 from oauth2 import get_current_user
 
 

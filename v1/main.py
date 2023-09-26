@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from utils.db import engine
-from routes import customer, user, products, product_category, cart
+from routes import customer, user, product, product_category, cart
 import models
 
 
@@ -31,6 +31,6 @@ def welcome():
 
 app.include_router(user.router)
 app.include_router(customer.router)
-app.include_router(products.router)
+app.include_router(product.router)
 app.include_router(product_category.router)
 app.include_router(cart.router)

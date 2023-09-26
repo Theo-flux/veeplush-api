@@ -1,27 +1,29 @@
+from typing import List
 from enum import Enum
-from datetime import datetime
 from pydantic import BaseModel, Field
 
 
 class OrderStatusSchema(str, Enum):
-    PENDING = "pending"
-    CANCELED = "canceled"
-    SHIPPED = "shipped"
-    DELIVERED = "delivered"
+    PENDING = "PENDING"
+    CANCELED = "CANCELED"
+    SHIPPED = "SHIPPED"
+    DELIVERED = "DELIVERED"
 
 
 class OrderItemSchema(BaseModel):
-    order_id: int
-    product_id: int
-    sub_total: float
-    length: int
-    style: str
-    qty: int
+    product_id: int = Field(...)
+    sub_total: float = Field(...)
+    length: int = Field(...)
+    style: str = Field(...)
+    qty: int = Field(...)
 
 
 class AddToCartSchema(BaseModel):
     customer_id: int = Field(...)
     order_status: str = OrderStatusSchema.PENDING
-    order_date: datetime = Field(...)
     total_amount: float = Field(...)
     order_items: List[OrderItemSchema] = Field(...)
+
+
+class GetCartResponseSchema(BaseModel):
+    pass

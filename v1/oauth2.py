@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 
 from utils.db import get_db
 import models
-from schemas.users import UserResponseSchema
-from schemas.customers import CustomerResponseSchema
+from schemas.user import UserResponseSchema
+from schemas.customer import CustomerResponseSchema
 
 
 load_dotenv()

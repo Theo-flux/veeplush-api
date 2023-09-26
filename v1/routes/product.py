@@ -11,7 +11,7 @@ from io import BytesIO
 
 from oauth2 import get_current_user
 import models
-from schemas.users import UserResponseSchema
+from schemas.user import UserResponseSchema
 from utils.db import get_db
 
 

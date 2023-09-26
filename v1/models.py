@@ -121,7 +121,8 @@ class Order(Base):
         Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False
     )
     order_status = Column(
-        Enum("Pending", "delivered", "canceled", "shipped", name="order_status")
+        String,
+        nullable=False,
     )
     order_date = Column(
         TIMESTAMP(timezone=True), server_default=text("now()"), nullable=False
@@ -148,7 +149,7 @@ class OrderItem(Base):
     product_id = Column(
         Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False
     )
-    order_id = Column(Integer, ForeignKey("orders.id"), nullable=False)
+    order_id = Column(Integer, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
     sub_total = Column(Float, nullable=False)
     length = Column(Integer, nullable=False)
     style = Column(String, nullable=False)
