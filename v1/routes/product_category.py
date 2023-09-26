@@ -12,6 +12,7 @@ router = APIRouter(prefix="/product_category", tags=['product_category'])
 
 @router.get("/")
 async def get_all_category(db: Session = Depends(get_db)):
+    """get all product categories"""
     categories = db.query(models.ProductCategory).all()
 
     category_list = [category.name for category in categories]
@@ -21,10 +22,11 @@ async def get_all_category(db: Session = Depends(get_db)):
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def add_category(
-    category: AddProductCategorySchema,
-    db: Session = Depends(get_db),
-    current_user: UserResponseSchema = Depends(get_current_user)
-):
+        category: AddProductCategorySchema,
+        db: Session = Depends(get_db),
+        current_user: UserResponseSchema = Depends(get_current_user)
+    ):
+    """add a product category"""
     category_exists = db.query(models.ProductCategory).filter(models.ProductCategory.name == category.name).first()
 
     if category_exists:
@@ -41,10 +43,11 @@ async def add_category(
 
 @router.delete("/{name}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_category(
-    name: str,
-    db: Session = Depends(get_db), 
-    current_user: UserResponseSchema = Depends(get_current_user)
-):
+        name: str,
+        db: Session = Depends(get_db), 
+        current_user: UserResponseSchema = Depends(get_current_user)
+    ):
+    """delete a product category by it's name"""
     to_delete = db.query(models.ProductCategory).filter(models.ProductCategory.name == name)
 
     if to_delete.first() is None:
