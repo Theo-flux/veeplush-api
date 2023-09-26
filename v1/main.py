@@ -17,10 +17,10 @@ app = FastAPI(
         "url": "http://www.github.com/Theo-flux",
         "email": "tifluse@gmail.com",
     },
-    # license_info={
-    #     "name": "BSD 2 Clause",
-    #     "url": "https://opensource.org/license/bsd-2-clause/",
-    # },
+    license_info={
+        "name": "MIT",
+        "url": "https://github.com/git/git-scm.com/blob/main/MIT-LICENSE.txt",
+    },
 )
 
 
