@@ -122,6 +122,8 @@ class OrderItem(Base):
     product_id = Column(Integer, ForeignKey('products.id', ondelete="CASCADE"), nullable=False)
     order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
     sub_total = Column(Float, nullable=False)
+    length = Column(Integer, nullable=False)
+    style = Column(String, nullable=False)
     qty = Column(Integer, nullable=False)
 
     order = relationship('Order', back_populates='order_item')

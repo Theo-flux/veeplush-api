@@ -15,7 +15,7 @@ from schemas.customers import (
 )
 
 
-router = APIRouter(prefix="/customer", tags=['customers'])
+router = APIRouter(prefix="/customer", tags=['customer'])
 
 @router.get("/all", response_model=int)
 async def customers(db: Session = Depends(get_db)):
