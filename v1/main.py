@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-"""app instance"""
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from utils.db import engine
@@ -25,7 +23,8 @@ app = FastAPI(
     # },
 )
 
-@app.get("/", tags=['Welcome'])
+
+@app.get("/", tags=["Welcome"])
 def welcome():
     return {"message": "welcome to my world"}
 
@@ -35,4 +34,3 @@ app.include_router(customer.router)
 app.include_router(products.router)
 app.include_router(product_category.router)
 app.include_router(cart.router)
-

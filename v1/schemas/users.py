@@ -8,10 +8,12 @@ class Role(str, Enum):
     SALESPERSON = "salesperson"
     ADMIN = "admin"
 
+
 class NewUserSchema(BaseModel):
     email: EmailStr
     username: str = Field(min_length=4)
     password: str = Field(min_length=8)
+
 
 class UserResponseSchema(BaseModel):
     id: int
@@ -24,7 +26,8 @@ class UserResponseSchema(BaseModel):
     class Config:
         from_attributes = True
 
+
 class CustomerLoginSchema(BaseModel):
-    username: Optional[str]  = None
-    email: Optional[EmailStr]  = None
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
     password: str

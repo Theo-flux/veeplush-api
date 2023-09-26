@@ -21,21 +21,23 @@ CLOUDINARY_NAME = getenv("CLOUDINARY_NAME")
 CLOUDINARY_API_KEY = getenv("CLOUDINARY_API_KEY")
 CLOUDINARY_SECRET_KEY = getenv("CLOUDINARY_SECRET_KEY")
 
-cloudinary.config( 
-  cloud_name = CLOUDINARY_NAME,
-  api_key = CLOUDINARY_API_KEY, 
-  api_secret = CLOUDINARY_SECRET_KEY
+cloudinary.config(
+    cloud_name=CLOUDINARY_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_SECRET_KEY,
 )
 
 
-router = APIRouter(prefix="/product", tags=['product'])
+router = APIRouter(prefix="/product", tags=["product"])
+
 
 def get_json_from_bytes(data: bytes):
     """converts byte to json serializable format"""
     return json.loads(data.decode("utf-8"))
 
+
 async def get_url(picture: File):
-    """uploads product image and returns the url""" 
+    """uploads product image and returns the url"""
     product_image = Image.open(picture.file)
     cloud_image = BytesIO()
     img_format = picture.filename.split(".")[1].upper()
@@ -47,10 +49,7 @@ async def get_url(picture: File):
     cloud_image.seek(0)
 
     result = cloud_uploader.upload(
-        cloud_image,
-        folder='veeplush',
-        crop='scale',
-        width=800
+        cloud_image, folder="veeplush", crop="scale", width=800
     )
 
     return result.get("url")
@@ -67,15 +66,22 @@ async def add_product(
     style: bytes = Form(...),
     stock_qty: int = Form(...),
     db: Session = Depends(get_db),
-    user: UserResponseSchema = Depends(get_current_user)
+    user: UserResponseSchema = Depends(get_current_user),
 ):
     """path params for adding product to database.
     only admins can access this route.
     """
-    prod_cat = db.query(models.ProductCategory).filter(models.ProductCategory.name == product_category_name).first()
+    prod_cat = (
+        db.query(models.ProductCategory)
+        .filter(models.ProductCategory.name == product_category_name)
+        .first()
+    )
 
     if not prod_cat:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"product category: {product_category_name} doesn't exist")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"product category: {product_category_name} doesn't exist",
+        )
 
     image_url: str = await get_url(image)
 
@@ -91,9 +97,9 @@ async def add_product(
         "price": price,
         "length": length_data,
         "style": style_data,
-        "stock_qty": stock_qty
+        "stock_qty": stock_qty,
     }
-    
+
     new_product = models.Product(**product_dict)
 
     db.add(new_product)

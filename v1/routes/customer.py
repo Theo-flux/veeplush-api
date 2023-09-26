@@ -11,11 +11,12 @@ from schemas import TokenSchema
 from schemas.customers import (
     NewCustomerSchema,
     CustomerLoginSchema,
-    CustomerResponseSchema
+    CustomerResponseSchema,
 )
 
 
-router = APIRouter(prefix="/customer", tags=['customer'])
+router = APIRouter(prefix="/customer", tags=["customer"])
+
 
 @router.get("/all", response_model=int)
 async def customers(db: Session = Depends(get_db)):
@@ -25,19 +26,36 @@ async def customers(db: Session = Depends(get_db)):
     return customers
 
 
-@router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=CustomerResponseSchema)
-async def create_customer(customer: NewCustomerSchema, db:Session = Depends(get_db)):
+@router.post(
+    "/signup",
+    status_code=status.HTTP_201_CREATED,
+    response_model=CustomerResponseSchema,
+)
+async def create_customer(customer: NewCustomerSchema, db: Session = Depends(get_db)):
     """create a new customer"""
-    customer_email_exists = db.query(models.Customer).filter(models.Customer.email == customer.email).first()
+    customer_email_exists = (
+        db.query(models.Customer)
+        .filter(models.Customer.email == customer.email)
+        .first()
+    )
 
     if customer_email_exists:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"a user with this email: {customer.email} already exists.")
-    
-    customer_username_exists = db.query(models.Customer).filter(models.Customer.username == customer.username).first()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"a user with this email: {customer.email} already exists.",
+        )
+
+    customer_username_exists = (
+        db.query(models.Customer)
+        .filter(models.Customer.username == customer.username)
+        .first()
+    )
 
     if customer_username_exists:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Username: {customer.username} already taken. Try a new one.")
-    
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Username: {customer.username} already taken. Try a new one.",
+        )
 
     hashed_pwd = get_pwd_hash(customer.password)
     customer.password = hashed_pwd
@@ -52,35 +70,56 @@ async def create_customer(customer: NewCustomerSchema, db:Session = Depends(get_
 
 
 @router.post("/login", response_model=TokenSchema)
-async def login_customer(credentials: CustomerLoginSchema, db: Session = Depends(get_db)):
+async def login_customer(
+    credentials: CustomerLoginSchema, db: Session = Depends(get_db)
+):
     """a path operation to login customers via their credentials."""
     customer = {}
     if credentials.username:
-        customer = db.query(models.Customer).filter(models.Customer.username == credentials.username).first()
+        customer = (
+            db.query(models.Customer)
+            .filter(models.Customer.username == credentials.username)
+            .first()
+        )
 
         if not customer:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="invalid details!")
-    
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="invalid details!"
+            )
+
     if credentials.email:
-        customer = db.query(models.Customer).filter(models.Customer.email == credentials.email).first()
+        customer = (
+            db.query(models.Customer)
+            .filter(models.Customer.email == credentials.email)
+            .first()
+        )
 
         if not customer:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="invalid details!")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="invalid details!"
+            )
 
     if not verify_pwd(credentials.password, customer.password):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="invalid details!")
-    
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="invalid details!"
+        )
+
     token = generate_token({"id": customer.id})
 
     return {"access_token": token, "token_type": "Bearer"}
 
 
-@router.get('/', response_model=CustomerResponseSchema)
+@router.get("/", response_model=CustomerResponseSchema)
 async def get_customer(email: EmailStr, db: Session = Depends(get_db)):
     """get a particular customer by their email"""
-    customer_by_mail = db.query(models.Customer).filter(models.Customer.email == email).first()
+    customer_by_mail = (
+        db.query(models.Customer).filter(models.Customer.email == email).first()
+    )
 
     if customer_by_mail is None:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"user with this email:{email} does not exist!")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"user with this email:{email} does not exist!",
+        )
 
     return customer_by_mail

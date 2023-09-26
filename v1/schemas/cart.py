@@ -20,8 +20,8 @@ class OrderItemSchema(BaseModel):
 
 
 class AddToCartSchema(BaseModel):
-    customer_id: int = Fiel(...)
-    order_status: OrderStatusSchema
-    order_date: datetime
-    total_amount: float
-    order_items: List[OrderItemSchema]
+    customer_id: int = Field(...)
+    order_status: str = OrderStatusSchema.PENDING
+    order_date: datetime = Field(...)
+    total_amount: float = Field(...)
+    order_items: List[OrderItemSchema] = Field(...)

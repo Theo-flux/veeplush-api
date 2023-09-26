@@ -1,6 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
-router = APIRouter(prefix="/cart", tags=['cart'])
+from schemas.cart import AddToCartSchema
+from utils.db import get_db
+from oauth2 import get_current_customer
+
+
+router = APIRouter(prefix="/cart", tags=["cart"])
 
 
 @router.get("/")
@@ -9,7 +15,10 @@ async def get_cart():
 
 
 @router.post("/")
-async def add_to_cart():
+async def add_to_cart(
+    db: Session = Depends(get_db),
+    current_customer: CustomerResponseSchema = Depends(get_current_customer),
+):
     return {"message": "add items to cart"}
 
 

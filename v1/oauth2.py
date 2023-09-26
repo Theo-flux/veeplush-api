@@ -15,9 +15,9 @@ from schemas.customers import CustomerResponseSchema
 
 load_dotenv()
 
-SECRET_KEY = environ.get('SECRET_KEY')
-ALGORITHM = environ.get('ALGORITHM')
-ACCESS_TOKEN_EXPIRE_MINUTES = int(environ.get('ACCESS_TOKEN_EXPIRE_MINUTES'))
+SECRET_KEY = environ.get("SECRET_KEY")
+ALGORITHM = environ.get("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(environ.get("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 oauth2_user_scheme = OAuth2PasswordBearer(tokenUrl="user_login")
 oauth2_customer_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -47,30 +47,32 @@ def verify_token(token: str, credentials_exception):
 
 
 def get_current_user(
-    token: str = Depends(oauth2_user_scheme),
-    db: Session = Depends(get_db)
+    token: str = Depends(oauth2_user_scheme), db: Session = Depends(get_db)
 ) -> UserResponseSchema:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="unauthorized!",
-        headers={"WWW-Authenticate": "Bearer"}
+        headers={"WWW-Authenticate": "Bearer"},
     )
     user_id = verify_token(token, credentials_exception)
-    current_user: UserResponseSchema = db.query(models.User).filter(models.User.id == user_id).first()
+    current_user: UserResponseSchema = (
+        db.query(models.User).filter(models.User.id == user_id).first()
+    )
 
-    return current_user    
+    return current_user
 
 
 def get_current_customer(
-    token: str = Depends(oauth2_customer_scheme),
-    db: Session = Depends(get_db)
+    token: str = Depends(oauth2_customer_scheme), db: Session = Depends(get_db)
 ) -> CustomerResponseSchema:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="unauthorized!",
-        headers={"WWW-Authenticate": "Bearer"}
+        headers={"WWW-Authenticate": "Bearer"},
     )
     customer_id = verify_token(token, credentials_exception)
-    current_customer = db.query(models.Customer).filter(models.Customer.id == customer_id).first()
+    current_customer = (
+        db.query(models.Customer).filter(models.Customer.id == customer_id).first()
+    )
 
     return current_customer

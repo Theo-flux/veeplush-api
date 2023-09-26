@@ -2,10 +2,12 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 
+
 class NewCustomerSchema(BaseModel):
     username: str = Field(min_length=4)
     password: str = Field(min_length=8)
     email: EmailStr
+
 
 class CustomerResponseSchema(BaseModel):
     id: int
@@ -24,7 +26,8 @@ class CustomerResponseSchema(BaseModel):
     class Config:
         from_attributes = True
 
+
 class CustomerLoginSchema(BaseModel):
-    username: Optional[str]  = None
-    email: Optional[EmailStr]  = None
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
     password: str
