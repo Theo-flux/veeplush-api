@@ -14,7 +14,7 @@ from oauth2 import generate_token
 
 router = APIRouter(prefix="/user", tags=['user'])
 
-'''@router.post('/create', response_model=UserResponseSchema)
+'''@router.post('/create', status_code=status.HTTP_201_CREATED, response_model=UserResponseSchema)
 async def create_user(user: NewUserSchema, db: Session = Depends(get_db)):
     """create a new user"""
     user_email_exists = db.query(models.User).filter(models.User.email == user.email).first()

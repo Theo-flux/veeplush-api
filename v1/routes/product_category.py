@@ -19,7 +19,7 @@ async def get_all_category(db: Session = Depends(get_db)):
     return category_list
 
 
-@router.post("/")
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def add_category(
     category: AddProductCategorySchema,
     db: Session = Depends(get_db),
@@ -37,3 +37,18 @@ async def add_category(
     db.refresh(new_category)
 
     return new_category
+
+
+@router.delete("/{name}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_category(
+    name: str,
+    db: Session = Depends(get_db), 
+    current_user: UserResponseSchema = Depends(get_current_user)
+):
+    to_delete = db.query(models.ProductCategory).filter(models.ProductCategory.name == name)
+
+    if to_delete.first() is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"category: {name} doesn't exist")
+    
+    to_delete.delete(synchronize_session=False)
+    db.commit()
