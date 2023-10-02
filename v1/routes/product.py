@@ -12,7 +12,7 @@ from io import BytesIO
 from oauth2 import get_current_user
 import models
 from schemas.user import UserResponseSchema
-from schemas.product import ProductResponse
+from schemas.product import ProductResponseSchema
 from utils.db import get_db
 
 
@@ -56,12 +56,23 @@ async def get_url(picture: File):
     return result.get("url")
 
 
-@router.get("/", response_model=List[ProductResponse])
+@router.get("/", response_model=List[ProductResponseSchema])
 async def get_all_products(db: Session = Depends(get_db)):
     """get all products"""
     products = db.query(models.Product).all()
 
     return products
+
+
+@router.get("/{id}", response_model=ProductResponseSchema)
+async def get_product_by_id(id: int, db: Session = Depends(get_db)):
+    """get product by id"""
+    product = db.query(models.Product).filter(models.Product.id == id).first()
+
+    if product is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+
+    return product
 
 
 @router.post("/create")

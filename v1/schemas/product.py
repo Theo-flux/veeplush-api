@@ -11,7 +11,7 @@ class ProductCategorySchema(BaseModel):
     name: str = Field(..., min_length=4)
 
 
-class ProductResponse(BaseModel):
+class ProductResponseSchema(BaseModel):
     product_category_id: int
     image: str
     price: float
