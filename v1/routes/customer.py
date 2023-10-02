@@ -3,7 +3,7 @@ from pydantic import EmailStr
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
-from oauth2 import generate_token
+from oauth2 import generate_token, get_current_customer
 from utils.db import get_db
 from utils.pwd_hash import get_pwd_hash, verify_pwd
 import models
@@ -74,6 +74,7 @@ async def login_customer(
     credentials: CustomerLoginSchema, db: Session = Depends(get_db)
 ):
     """a path operation to login customers via their credentials."""
+    print(credentials)
     customer = {}
     if credentials.username:
         customer = (
@@ -109,17 +110,7 @@ async def login_customer(
     return {"access_token": token, "token_type": "Bearer"}
 
 
-@router.get("/", response_model=CustomerResponseSchema)
-async def get_customer(email: EmailStr, db: Session = Depends(get_db)):
-    """get a particular customer by their email"""
-    customer_by_mail = (
-        db.query(models.Customer).filter(models.Customer.email == email).first()
-    )
-
-    if customer_by_mail is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"user with this email:{email} does not exist!",
-        )
-
-    return customer_by_mail
+@router.get("/me", response_model=CustomerResponseSchema)
+async def get_customer(customer=Depends(get_current_customer)):
+    """get a customer"""
+    return customer

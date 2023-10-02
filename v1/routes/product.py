@@ -1,6 +1,6 @@
 import json
 from os import getenv
-from typing import Dict
+from typing import Dict, List
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException, status
 from sqlalchemy.orm import Session
@@ -12,6 +12,7 @@ from io import BytesIO
 from oauth2 import get_current_user
 import models
 from schemas.user import UserResponseSchema
+from schemas.product import ProductResponse
 from utils.db import get_db
 
 
@@ -53,6 +54,14 @@ async def get_url(picture: File):
     )
 
     return result.get("url")
+
+
+@router.get("/", response_model=List[ProductResponse])
+async def get_all_products(db: Session = Depends(get_db)):
+    """get all products"""
+    products = db.query(models.Product).all()
+
+    return products
 
 
 @router.post("/create")

@@ -13,13 +13,13 @@ class CustomerResponseSchema(BaseModel):
     id: int
     username: str
     email: EmailStr
-    first_name: str
-    last_name: str
-    phone_number: str
-    country: str
-    city: str
-    state: str
-    postal_code: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    country: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
