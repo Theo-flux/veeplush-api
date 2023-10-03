@@ -42,7 +42,7 @@ async def create_customer(customer: NewCustomerSchema, db: Session = Depends(get
     if customer_email_exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"a user with this email: {customer.email} already exists.",
+            detail=f"email: {customer.email} exists.",
         )
 
     customer_username_exists = (
@@ -54,7 +54,7 @@ async def create_customer(customer: NewCustomerSchema, db: Session = Depends(get
     if customer_username_exists:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Username: {customer.username} already taken. Try a new one.",
+            detail=f"Username: {customer.username} taken. Try a new one.",
         )
 
     hashed_pwd = get_pwd_hash(customer.password)
