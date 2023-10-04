@@ -26,4 +26,9 @@ class AddToCartSchema(BaseModel):
 
 
 class GetCartResponseSchema(BaseModel):
-    pass
+    product_id: int
+    order_id: int
+    sub_total: float
+    length: int
+    style: str
+    qty: int

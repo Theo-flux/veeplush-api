@@ -1,3 +1,4 @@
+from typing import List, Union
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import cast, String
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/cart", tags=["cart"])
 
 
 @router.get("/orders")
-async def get_cart(
+async def get_all_orders(
     db: Session = Depends(get_db),
     current_customer: CustomerResponseSchema = Depends(get_current_customer),
 ):
@@ -44,7 +45,33 @@ async def get_cart(
     return []
 
 
-@router.post("/add_order_item")
+@router.get("/customer_cart", response_model=Union[List[GetCartResponseSchema], List])
+async def get_cart(
+    db: Session = Depends(get_db),
+    current_customer: CustomerResponseSchema = Depends(get_current_customer),
+):
+    customer_pending_order = (
+        db.query(models.Order)
+        .filter(
+            models.Order.customer_id == current_customer.id,
+            cast(models.Order.order_status, String).ilike(OrderStatusSchema.PENDING),
+        )
+        .first()
+    )
+
+    if customer_pending_order:
+        custormer_order_items = (
+            db.query(models.OrderItem)
+            .filter(models.OrderItem.order_id == customer_pending_order.id)
+            .all()
+        )
+
+        return custormer_order_items
+
+    return []
+
+
+@router.post("/add_order_item", status_code=status.HTTP_201_CREATED)
 async def add_to_cart(
     order_item: OrderItemSchema,
     db: Session = Depends(get_db),
