@@ -32,3 +32,8 @@ class GetCartResponseSchema(BaseModel):
     length: int
     style: str
     qty: int
+    name: str
+    price: float
+    product_img: str
+    stock_qty: int
+

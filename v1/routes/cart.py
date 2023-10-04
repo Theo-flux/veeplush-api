@@ -1,7 +1,7 @@
 from typing import List, Union
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import cast, String
+from sqlalchemy import cast, String, text
 
 from schemas.cart import (
     AddToCartSchema,
@@ -60,13 +60,38 @@ async def get_cart(
     )
 
     if customer_pending_order:
-        custormer_order_items = (
-            db.query(models.OrderItem)
-            .filter(models.OrderItem.order_id == customer_pending_order.id)
-            .all()
+        sql_query = text(
+            """
+            SELECT *
+            FROM order_items
+            JOIN products ON order_items.product_id = products.id
+            WHERE order_items.order_id = :order_id
+            """
         )
 
-        return custormer_order_items
+        customer_order_items = db.execute(
+            sql_query, {"order_id": customer_pending_order.id}
+        ).fetchall()
+        cart_item = []
+        for row in customer_order_items:
+            cart_item.append(
+                {
+                    "product_img": row[11],
+                    "product_id": row[1],
+                    "order_id": row[0],
+                    "sub_total": row[3],
+                    "length": row[4],
+                    "style": row[5],
+                    "qty": row[6],
+                    "price": row[13],
+                    "name": row[10],
+                    "stock_qty": row[-1],
+                }
+            )
+
+        # print(cart_item)
+
+        return cart_item
 
     return []
 
@@ -144,6 +169,35 @@ async def add_to_cart(
     return
 
 
-@router.delete("/")
-async def delete_item_from_cart(id: int):
-    return {"message": "delete an item from cart"}
+@router.delete("/delete_item/{id}")
+async def delete_item_from_cart(
+    id: int,
+    db: Session = Depends(get_db),
+    current_customer: CustomerResponseSchema = Depends(get_current_customer),
+):
+    # check if there are pending orders.
+    customer_pending_orders = (
+        db.query(models.Order)
+        .filter(
+            models.Order.customer_id == current_customer.id,
+            cast(models.Order.order_status, String).ilike(OrderStatusSchema.PENDING),
+        )
+        .first()
+    )
+
+    if customer_pending_orders:
+        # check if order_item already exists.
+        customer_order_item_exists = db.query(models.OrderItem).filter(
+            models.OrderItem.product_id == id
+        )
+
+        # if it exists just delete it.
+        if customer_order_item_exists.first():
+            customer_order_item_exists.delete(
+                synchronize_session=False,
+            )
+            db.commit()
+
+            return "successfully removed!"
+
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
