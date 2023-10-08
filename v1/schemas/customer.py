@@ -16,6 +16,7 @@ class CustomerResponseSchema(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     phone_number: Optional[str] = None
+    shipping_address: Optional[str] = None
     country: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
@@ -31,3 +32,14 @@ class CustomerLoginSchema(BaseModel):
     username: Optional[str] = None
     email: Optional[EmailStr] = None
     password: str
+
+
+class CustomerInfoSchema(BaseModel):
+    first_name: str = Field(...)
+    last_name: str = Field(...)
+    phone_number: str = Field(..., min_length=11)
+    shipping_address: str = Field(...)
+    country: str = Field(...)
+    city: str = Field(...)
+    state: str = Field(...)
+    postal_code: str = Field(...)

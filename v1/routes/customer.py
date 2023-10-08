@@ -12,6 +12,7 @@ from schemas.customer import (
     NewCustomerSchema,
     CustomerLoginSchema,
     CustomerResponseSchema,
+    CustomerInfoSchema,
 )
 
 
@@ -114,3 +115,25 @@ async def login_customer(
 async def get_customer(customer=Depends(get_current_customer)):
     """get a customer"""
     return customer
+
+
+@router.post(
+    "/update_info",
+    response_model=CustomerResponseSchema,
+)
+async def update_customer_info(
+    info: CustomerInfoSchema,
+    db: Session = Depends(get_db),
+    customer=Depends(get_current_customer),
+):
+    """update customer info"""
+    print(info)
+    customer_info = db.query(models.Customer).filter(models.Customer.id == customer.id)
+
+    if not customer_info.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    if customer_info.first():
+        customer_info.update(info.dict(), synchronize_session=False)
+        db.commit()
+        return customer
