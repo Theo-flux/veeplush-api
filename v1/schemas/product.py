@@ -1,5 +1,5 @@
 from fastapi import Form, UploadFile, File
-from typing import List, Dict, Annotated, Dict 
+from typing import List, Dict, Dict 
 from pydantic import BaseModel, Field
 
 
