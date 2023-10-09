@@ -16,6 +16,8 @@ SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOSTNAME}/{DB_NAME}"
 )
 
+# postgres://theo:NN2ReUoineoiYM4Cm1vPO22UCWEFEmIM@dpg-ckho5ja12bvs73fm4850-a.oregon-postgres.render.com/veeplush
+
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
